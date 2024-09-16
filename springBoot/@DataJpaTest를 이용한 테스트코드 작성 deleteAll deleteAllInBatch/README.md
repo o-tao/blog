@@ -88,7 +88,7 @@ testRuntimeOnly 'com.h2database:h2'
 라이브러리만 build.gradle에 추가해도 무관합니다.   
 (필자는 Test를 위한 yml설정을 어떻게 하였는지 직관적으로 확인하기 위해 작성)
 
-![Alt text](/springboot/@DataJpaTest를 이용한 테스트코드 작성 deleteAll deleteAllInBatch/images/1.png)
+![Alt text](/springBoot/@DataJpaTest를 이용한 테스트코드 작성 deleteAll deleteAllInBatch/images/1.png)
 
 
 main/resources 아래 application.yml   
@@ -162,8 +162,8 @@ public void deleteAll() {
 }
 ```
 
-![Alt text](/springboot/@DataJpaTest를 이용한 테스트코드 작성 deleteAll deleteAllInBatch/images/2.png)
-![Alt text](/springboot/@DataJpaTest를 이용한 테스트코드 작성 deleteAll deleteAllInBatch/images/3.png)
+![Alt text](/springBoot/@DataJpaTest를 이용한 테스트코드 작성 deleteAll deleteAllInBatch/images/2.png)
+![Alt text](/springBoot/@DataJpaTest를 이용한 테스트코드 작성 deleteAll deleteAllInBatch/images/3.png)
 
 deleteAll을 이용하여 Test실행 결과 JPA데이터를 삭제하기 위해 조회 후 각 PK별로 delete 쿼리가 동작하여 처리되는 것을 확인할 수 있습니다.
 
@@ -190,7 +190,7 @@ public void deleteAll() {
 }
 ```
 
-![Alt text](/springboot/@DataJpaTest를 이용한 테스트코드 작성 deleteAll deleteAllInBatch/images/4.png)
+![Alt text](/springBoot/@DataJpaTest를 이용한 테스트코드 작성 deleteAll deleteAllInBatch/images/4.png)
 
 deleteAllInBatch를 이용하여 Test실행 결과 JPA데이터 삭제 시 한 번의 delete 쿼리가 동작하여 처리되는 것을 확인할 수 있습니다.
 
