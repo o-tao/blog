@@ -10,3 +10,6 @@ https://tao-tech.tistory.com/ 에서 제공되는 게시글 및 code 입니다.
 ## Spring Boot
 - #### @DataJpaTest를 이용한 테스트코드 작성 deleteAll? deleteAllInBatch? [Tistory](https://tao-tech.tistory.com/9) [GitHub](https://github.com/o-tao/blog/tree/main/springboot/%40DataJpaTest%EB%A5%BC%20%EC%9D%B4%EC%9A%A9%ED%95%9C%20%ED%85%8C%EC%8A%A4%ED%8A%B8%EC%BD%94%EB%93%9C%20%EC%9E%91%EC%84%B1%20deleteAll%20deleteAllInBatch)
 - #### @DataJpaTest, @SpringBootTest 차이 [Tistory](https://tao-tech.tistory.com/10) [GitHub](https://github.com/o-tao/blog/tree/main/springBoot/DataJpaTest%EC%99%80%20SpringBootTest%EC%9D%98%20%EC%B0%A8%EC%9D%B4%EC%A0%90)
+
+## Server
+- #### REST API, RESTful API란? [Tistory](https://tao-tech.tistory.com/11) [GitHub](https://github.com/o-tao/blog/tree/main/server/REST%20API%2C%20RESTful%20API%EB%9E%80%3F)
