@@ -1,10 +1,10 @@
 CSR과 SSR의 개념과 차이점을 알아보기 전 SPA와 MPA의 개념과 차이점에 대해 먼저 알아보도록 하겠습니다.
 
-![Alt text](/server/CSR과 SSR의 개념과 차이점/images/1.png)
+![1](https://github.com/user-attachments/assets/84b13919-d274-4598-8b21-468f95aad4bb)
 
 # SPA(Single Page Application)
 
-![Alt text](/server/CSR과 SSR의 개념과 차이점/images/2.png)
+![2](https://github.com/user-attachments/assets/2623d0b5-ce45-40d6-b1b4-b6d68cd4294f)
 
 ## 개념
 
@@ -20,7 +20,7 @@ CSR과 SSR의 개념과 차이점을 알아보기 전 SPA와 MPA의 개념과 �
 
 # MPA(Multiple Page Application)
 
-![Alt text](/server/CSR과 SSR의 개념과 차이점/images/3.png)
+![3](https://github.com/user-attachments/assets/60ac22bc-02e0-4592-bfec-fffb52d562d0)
 
 ## 개념
 
@@ -36,7 +36,7 @@ CSR과 SSR의 개념과 차이점을 알아보기 전 SPA와 MPA의 개념과 �
 
 # CSR(Client Side Rendering)
 
-![Alt text](/server/CSR과 SSR의 개념과 차이점/images/4.png)
+![4](https://github.com/user-attachments/assets/34d2e223-f4b2-4104-97bd-a79d2c154c98)
 
 ## 작동 방식
 
@@ -64,7 +64,7 @@ CSR과 SSR의 개념과 차이점을 알아보기 전 SPA와 MPA의 개념과 �
 
 # SSR(Server Side Rendering)
 
-![Alt text](/server/CSR과 SSR의 개념과 차이점/images/5.png)
+![5](https://github.com/user-attachments/assets/94762943-f5cf-4569-b6d8-7cb18086ae37)
 
 ## 작동 방식
 
