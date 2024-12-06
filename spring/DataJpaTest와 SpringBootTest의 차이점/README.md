@@ -7,7 +7,7 @@
   - 데이터 액세스 레이어에 집중하여 구체적인 테스트 가능
   - in-memory embedded DB 사용 가능
 
-![Alt text](/springBoot/DataJpaTest와 SpringBootTest의 차이점/images/1.png)   
+![Alt text](/spring/DataJpaTest와 SpringBootTest의 차이점/images/1.png)   
 @DataJpaTest가 포함하고 있는 어노테이션 입니다.
 
 ## @TypeExcludeFilters
