@@ -244,3 +244,150 @@ totalElements: 총데이터의 개수
 <img width="455" alt="3" src="https://github.com/user-attachments/assets/88526340-2a62-41a6-99a1-307963960de2" />
 
 기본세팅한 값이 아닌 값을 요청하여 호출할 경우 그에 따른 페이지와 size에 따른 페이지수를 적용하는 모습을 볼 수 있습니다.   
+
+# JPA + QueryDSL offset Pagination 예제코드
+
+QueryDSL을 사용한 offset 예제코드에서도 응답되는 JSON 동일하며,   
+로직이 변경되지 않는 Entity, Request DTO, Controller를 제외하고 변경되는 로직을 중점적으로 작성하도록 하겠습니다.
+
+## Config
+
+```java
+@Configuration
+public class QueryDslConfig {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Bean
+    public JPAQueryFactory queryFactory() {
+        return new JPAQueryFactory(entityManager);
+    }
+}
+```
+
+먼저 QueryDSL을 사용하기 위한 Config 클래스를 생성합니다.
+
+`@Configuration` Spring이 이 클래스를 설정 클래스(Bean을 정의하는 클래스)로 인식하기 위한 어노테이션   
+`@PersistenceContext` JPA의 EntityManager를 주입하기 위한 어노테이션   
+`JPAQueryFactory` QueryDSL에서 제공하는 쿼리 생성기, JPA와 함께 사용되어 안전한 쿼리를 작성하게 해 줍니다.   
+`@Bean` 어노테이션을 통해 Spring 컨텍스트에 등록되며, 다른 클래스에서 주입받아 사용이 가능합니다.
+
+## QueryRepository
+
+```java
+@Repository
+@RequiredArgsConstructor
+public class QueryRepository {
+
+    private final JPAQueryFactory jpaQueryFactory;
+
+    public List<Todo> findByTodos(int page, int size) {
+        return jpaQueryFactory
+                .selectFrom(todo)
+                .offset((long) (page - 1) * size)
+                .limit(size)
+                .fetch();
+    }
+
+    public Long countByTodo() {
+        return jpaQueryFactory
+                .select(todo.count())
+                .from(todo)
+                .fetchOne();
+    }
+}
+```
+
+- findByTodos 메서드
+해당 메서드는 페이지네이션을 통해 Todo 엔티티 리스트를 반환합니다.   
+`jpaQueryFactory.selectFrom(todo)`는 `Todo` 엔티티를 선택하는 기본 쿼리의 시작점입니다.   
+`offset((long) (page - 1) * size)`는 SQL의 OFFSET을 설정합니다. 페이지 번호에 따라 어느 데이터부터 가져올지를 결정합니다.    
+-1을 넣어줌으로써 0페이지가 아닌 1페이지부터 시작하게 작성하였습니다.   
+`limit(size)`는 SQL의 LIMIT을 설정하여 한 번에 가져올 데이터의 수를 제한합니다.   
+`fetch()`는 실행된 쿼리의 결과를 List로 반환합니다.
+
+findByTodos 메서드의 SQL 쿼리는 다음과 같습니다.
+```sql
+-- page가 1이고 size가 10 일 경우
+SELECT * FROM todos ORDER BY id LIMIT 10 OFFSET 0;  -- 1페이지
+```
+
+- countByTodo 메서드
+해당 메서드는 Todo 엔티티의 총개수를 반환합니다.   
+`select(todo.count())`는 Todo의 개수를 선택하는 쿼리입니다.   
+`fetchOne()`은 결과를 단일 값으로 반환합니다. 여기서는 Todo의 총개수를 반환하게 됩니다. (totalElements)
+
+countByTodo 메서드의 SQL 쿼리는 다음과 같습니다.
+```sql
+SELECT COUNT(*) FROM todos;
+```
+
+## Response DTO
+
+```java
+@Getter
+public class OffsetInfoResponse<T> {
+
+    private final List<T> contents;
+    private final int page;
+    private final int size;
+    private final long totalPages;
+    private final long totalElements;
+
+    private OffsetInfoResponse(List<T> contents, int page, int size, long totalElements) {
+        this.contents = contents;
+        this.page = page;
+        this.size = size;
+        this.totalPages = (int) Math.ceil((double) totalElements / size); // 총 페이지 계산
+        this.totalElements = totalElements;
+    }
+
+    public static <T> OffsetInfoResponse<T> of(List<T> contents, int page, int size, long totalElements) {
+        return new OffsetInfoReesponse<>(contents, page, size, totalElements);
+    }
+}
+```
+Response DTO는 이전에 SpringDataJPA로만 구현한 예제코드와 동일하며 변경점은   
+PageRequest.of를 사용하지 않고 값을 전달하여 totalPages를 매개변수로 받지 않고 클래스 내에서 직접 계산하여 적용하였습니다.
+
+## Service
+```java
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class OffsetService {
+
+    private final QueryRepository queryRepository;
+
+    public OffsetInfoResponse<OffsetResponse> offsetPagination(int page, int size) {
+        List<Todo> todos = queryRepository.findByTodos(page, size);
+        long totalElements = queryRepository.countByTodo();
+        return OffsetInfoResponse.of(
+                todos.stream().map(OffsetResponse::of).toList(),
+                page,
+                size,
+                totalElements
+        );
+    }
+}
+```
+Service 클래스에서는 QueryRepository에서 작성한 메서드로 엔티티 리스트, 총 데이터 수를 생성하여 응답합니다.   
+SpringDataJPA 구현예제와의 변경점은 PageRequest.of를 사용하지 않고 직접 값을 매개변수로 받아 사용하고 있으며 QueryDSL을 통해 직접적으로 Todo 엔티티 리스트, 총 데이터 수를 생성하여 반환하고 있습니다.
+
+QueryDSL을 통한 예제코드 역시 SpringDataJPA의 예제코드와 동일한 결과를 보여줍니다.
+
+예제코드를 통해 offset 구현방식에 대해 알아보았는데 중간에 페이지 값을 계산한 식이 있었는데 페이지네이션 값 계산을 정리하자면 다음과 같습니다.
+
+## Pagination 값 계산
+
+- 총 페이지 개수 = Math.ceil(전체 컨텐츠 개수 / 한 페이지에 보여줄 컨텐츠의 개수)
+- 화면에 보여질 페이지 그룹 = Math.ceil(현재 페이지 번호 / 한 화면에 보여줄 페이지의 개수)
+- 화면에 보여질 페이지의 첫 번째 페이지 번호 = ((페이지 그룹 번호 - 1) * 한 화면에 보여줄 페이지의 개수) + 1
+- 화면에 보여질 페이지의 마지막 페이지 번호 = 페이지 그룹 번호 * 한 화면에 보여줄 페이지의 개수 단, 페이지 그룹 번호 * 한 화면에 보여줄 페이지의 개수가 전체 페이지 개수보다 크다면 전체 페이지가 된다
+
+## offset 정리
+
+offset은 주어진 페이지 번호에 따라 데이터를 조회하는 방법으로, LIMIT와 OFFSET을 사용하여 데이터를 페이지 단위로 나누어 가져오는 방식입니다.   
+이는 사용자가 페이지를 지정하여 원하는 페이지를 즉시 조회할 수 있는 장점이 있습니다.   
+하지만 페이지 조회 시 데이터를 처음부터 읽어와 원하는 페이지를 보여주게 되는데 이는 다량의 데이터처리 시 데이터가 많아질수록 처리속도가 점점 저하될 수 있다는 단점이 있습니다.
