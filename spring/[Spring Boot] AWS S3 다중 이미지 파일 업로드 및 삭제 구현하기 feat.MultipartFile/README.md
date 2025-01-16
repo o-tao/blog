@@ -1,5 +1,5 @@
 이미지와 같은 정적 파일을 효율적으로 관리하는 것은 웹 애플리케이션 개발에서 자주 마주하게 됩니다. 이때, 클라우드 기반 저장소인 `AWS S3 (Simple Storage Service)`는 높은 확정성과 안정성을 제공합니다.   
-이번 포스팅에서는 Java 기반 Spring Boot 환경에서 `MultipartFile`방식을 활용하여 `AWS S3`에 이미지를 업로드하는 방법에 대해 알아보도록 하겠습니다.
+이번 포스팅에서는 Java 기반 Spring Boot 환경에서 `MultipartFile`방식을 활용하여 다중으로 `AWS S3`에 이미지파일을 업로드하는 방법과 업로드된 이미지파일을 삭제하는 방법에 대해 알아보도록 하겠습니다.
 
 # MultipartFile 업로드 방식 개념
 
@@ -166,7 +166,7 @@ public class S3Config {
 
 S3Client를 Spring Bean에 등록하고, yml에 설정한 Key와 region 값을 @Value 어노테이션으르 통해 주입합니다.
 
-## Service 업로드 비즈니스 로직 작성
+## Service 이미지 업로드 비즈니스 로직 작성
 
 ```java
 @Slf4j
@@ -175,7 +175,6 @@ S3Client를 Spring Bean에 등록하고, yml에 설정한 Key와 region 값을 @
 public class S3ImageService {
 
     private final S3Client s3Client;
-
     @Value("${aws.s3.bucket-name}")
     private String bucketName;
 
@@ -251,9 +250,9 @@ public class S3ImageService {
 }
 ```
 
-각 메서드의 역할과 메서드에 대한 세부 설명에 대해 주석으로 설명하였습니다.
+다중 이미지 업로드를 수행하는 비즈니스 로직을 작성하였으며, 주석으로 각 메서드의 역할과 메서드에 대한 세부 설명에 대해 남겨놓았습니다. 
 
-## Test용 업로드 Controller 생성
+## Test용 이미지 업로드 Controller 생성
 
 ```java
 @RestController
@@ -295,3 +294,116 @@ Postman을 통해 이미지 업로드 요청 시 S3에 정상적으로 객체가
 
 파일 존재 유무와 확장자에 대한 유효성 검증도 정상적으로 이루어지는 모습을 확인할 수 있습니다.
 
+## Service 이미지 삭제 비즈니스 로직 작성
+
+```java
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class S3ImageService {
+
+    private final S3Client s3Client;
+    @Value("${aws.s3.bucket-name}")
+    private String bucketName;
+
+    // [public 메서드] 이미지의 public url을 이용하여 S3에서 해당 이미지를 제거, getKeyFromImageAddress 메서드를 호출하여 삭제에 필요한 key 획득
+    public void delete(List<String> imageUrls) {
+      List<String> keys = imageUrls.stream()
+              .map(this::getKeyFromImageUrls)
+              .toList();
+
+      try {
+        // S3에서 파일을 삭제하기 위한 요청 객체 생성
+        DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
+                .bucket(bucketName) // S3 버킷 이름 지정
+                .delete(delete -> delete.objects(
+                        // S3 객체들을 삭제할 객체 목록을 생성
+                        keys.stream()
+                                .map(key -> ObjectIdentifier.builder().key(key).build())
+                                .toList()
+                ))
+                .build();
+        s3Client.deleteObjects(deleteObjectsRequest); // S3에서 객체 삭제
+      } catch (Exception exception) {
+        log.error(exception.getMessage(), exception);
+        throw new CustomApplicationException(ErrorCode.IO_EXCEPTION_DELETE_FILE);
+      }
+    }
+
+    // [private 메서드] 삭제에 필요한 key 반환
+    private String getKeyFromImageUrls(String imageUrl) {
+      try {
+        URL url = new URI(imageUrl).toURL(); // 인코딩된 주소를 URI 객체로 변환 후 URL 객체로 변환
+        String decodedKey = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8);// URI에서 경로 부분을 가져와 URL 디코딩을 통해 실제 키로 변환
+        return decodedKey.substring(1); // 경로 앞에 '/'가 있으므로 이를 제거한 뒤 반환
+      } catch (Exception exception) {
+        log.error(exception.getMessage(), exception);
+        throw new CustomApplicationException(ErrorCode.INVALID_URL_FORMAT);
+      }
+    }
+
+}
+```
+
+다중 이미지 삭제를 수행하는 비즈니스 로직을 작성하였으며, 주석으로 각 메서드의 역할과 메서드에 대한 세부 설명에 대해 남겨놓았습니다.
+
+## Test용 이미지 삭제 Controller 생성
+
+```java
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/s3")
+public class S3ImageController {
+
+    private final S3ImageService s3ImageService;
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> s3Delete(@RequestBody ImageDeleteRequest imageDeleteRequest) {
+        s3ImageService.delete(imageDeleteRequest.getImageUrls());
+        return ResponseEntity.ok("이미지 삭제 성공");
+    }
+
+}
+```
+
+### Request Dto
+
+```java
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ImageDeleteRequest {
+
+    private List<String> imageUrls;
+
+    public ImageDeleteRequest(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
+    }
+    
+}
+```
+
+요청 List 객체를 사용하여 컨트롤러를 작성하였습니다.
+
+## Postman 요청 테스트
+
+<div>
+<img width="1082" alt="23" src="https://github.com/user-attachments/assets/23433ed8-7566-46da-b05c-9e9512f9439b" />
+<br>
+<img width="1626" alt="24" src="https://github.com/user-attachments/assets/e788bb5e-18c8-49d5-b46e-0adb5163a57e" />
+<br>
+<img width="1620" alt="25" src="https://github.com/user-attachments/assets/8cd7deb0-cb7d-431c-8aa7-3b80d667a627" />
+</div>
+
+Postman을 통해 이미지 삭제 요청 시 요청 받은 이미지가 전부 삭제되는 모습을 볼 수 있습니다.
+
+# 마무리
+
+이번 포스팅에서는 Spring Boot 환경에서 `MultipartFile` 방식을 사용하여 AWS S3에 다중의 이미지 파일을 업로드하고 삭제하는 방법에 대해 알아보았습니다.   
+필자의 경우 MultipartFile 방식을 사용하여 예제를 구현하였는데, 파일 업로드 방식에는 `Stream`, `MultipartFile`, `AWS Multipart` 등 여러 방식이 존재하며 각 상황에 따라 적절한 방법을 선택할 수 있습니다.
+
+### 참고
+
+https://techblog.woowahan.com/11392
+
+### 소스코드   
+https://github.com/o-tao/upload-image
