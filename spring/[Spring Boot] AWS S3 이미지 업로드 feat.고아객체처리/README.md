@@ -160,6 +160,7 @@ public class S3Config {
                 .region(Region.of(region))
                 .build();
     }
+    
 }
 ```
 
@@ -248,6 +249,7 @@ public class S3ImageService {
         // public url 반환
         return s3Client.utilities().getUrl(url -> url.bucket(bucketName).key(s3FileName)).toString();
     }
+    
 }
 ```
 
