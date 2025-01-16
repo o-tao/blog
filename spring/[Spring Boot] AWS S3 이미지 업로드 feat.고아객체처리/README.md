@@ -1,5 +1,5 @@
 이미지와 같은 정적 파일을 효율적으로 관리하는 것은 웹 애플리케이션 개발에서 자주 마주하게 됩니다. 이때, 클라우드 기반 저장소인 `AWS S3 (Simple Storage Service)`는 높은 확정성과 안정성을 제공합니다.   
-이번 포스팅에서는 Java 기반 Spring Boot 환경에서 `MultipartFile`방식을 활용하여 `AWS S3`에 이미지를 업로드하는 방법, 상품 등록 시 이미지를 함께 업로드하는 방법과 업로드된 이미지가 삭제되지 않고 남아있는 `고아 객체 (Orphan Object)`를 어떻게 처리할 수 있는지에 대해 알아보도록 하겠습니다.
+이번 포스팅에서는 Java 기반 Spring Boot 환경에서 `MultipartFile`방식을 활용하여 `AWS S3`에 이미지를 업로드하는 방법에 대해 알아보도록 하겠습니다.
 
 # MultipartFile 업로드 방식 개념
 
@@ -165,9 +165,10 @@ public class S3Config {
 
 S3Client를 Spring Bean에 등록하고, yml에 설정한 Key와 region 값을 @Value 어노테이션으르 통해 주입합니다.
 
-## Service 비즈니스 로직 작성
+## Service 업로드 비즈니스 로직 작성
 
 ```java
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class S3ImageService {
@@ -192,15 +193,17 @@ public class S3ImageService {
         validateFile(file.getOriginalFilename()); // 파일 유효성 검증
         try {
             return uploadImageToS3(file); // 이미지를 S3에 업로드하고, 저장된 파일의 public url을 서비스 로직에 반환
-        } catch (IOException e) {
+        } catch (IOException exception) {
+            log.error(exception.getMessage(), exception);
             throw new CustomApplicationException(ErrorCode.IO_EXCEPTION_UPLOAD_FILE);
         }
     }
 
     private void validateFile(String filename) {
-        // 파일 이름 존재 유무 검증
+        System.out.println(filename);
+        // 파일 존재 유무 검증
         if (filename == null || filename.isEmpty()) {
-            throw new CustomApplicationException(ErrorCode.NOT_EXIST_FILE_NAME);
+            throw new CustomApplicationException(ErrorCode.NOT_EXIST_FILE);
         }
 
         // 확장자 존재 유무 검증
@@ -238,13 +241,57 @@ public class S3ImageService {
             // S3에 이미지 업로드
             s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(inputStream, file.getSize()));
         } catch (Exception exception) {
+            log.error(exception.getMessage(), exception);
             throw new CustomApplicationException(ErrorCode.IO_EXCEPTION_UPLOAD_FILE);
         }
 
         // public url 반환
         return s3Client.utilities().getUrl(url -> url.bucket(bucketName).key(s3FileName)).toString();
     }
+}
+```
+
+각 메서드의 역할과 메서드에 대한 세부 설명에 대해 주석으로 설명하였습니다.
+
+## Test용 업로드 Controller 생성
+
+```java
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/s3")
+public class S3ImageController {
+
+    private final S3ImageService s3ImageService;
+
+    @PostMapping("/upload")
+    public ResponseEntity<List<String>> s3Upload(@RequestPart(value = "image", required = false) List<MultipartFile> multipartFile) {
+        List<String> upload = s3ImageService.upload(multipartFile);
+        return ResponseEntity.ok(upload);
+    }
 
 }
 ```
+
+`MultipartFile`방식으로 이미지를 업로드하므로 `@RequestPart`를 사용하여 Controller에서 요청 데이터를 받습니다.   
+
+## Postman 요청 테스트
+
+<div>
+<img width="1074" alt="18" src="https://github.com/user-attachments/assets/ea256194-c8a1-4753-9a06-316c0b1072ec" />
+<br>
+<img width="1621" alt="19" src="https://github.com/user-attachments/assets/5c245ae3-eddf-45aa-8436-e2984e039729" />
+<br>
+<img width="1743" alt="20" src="https://github.com/user-attachments/assets/4f88dc75-a829-4d1e-bf85-36c7a1eb3f6f" />
+</div>
+
+Postman을 통해 이미지 업로드 요청 시 S3에 정상적으로 객체가 생성되는 모습을 확인할 수 있습니다.   
+추가로 `ACL 설정`을 `퍼블릭 읽기 권한`으로 설정했기 때문에 응답받은 이미지 url을 브라우저에 입력하여 업로드된 이미지를 확인할 수 있습니다.   
+
+<div>
+<img width="1075" alt="21" src="https://github.com/user-attachments/assets/82841639-32ca-4fe5-9643-369f4a6c2220" />
+<br>
+<img width="1077" alt="22" src="https://github.com/user-attachments/assets/3d2a1c51-75dc-4cd0-8422-48518773f253" />
+</div>
+
+파일 존재 유무와 확장자에 대한 유효성 검증도 정상적으로 이루어지는 모습을 확인할 수 있습니다.
 
