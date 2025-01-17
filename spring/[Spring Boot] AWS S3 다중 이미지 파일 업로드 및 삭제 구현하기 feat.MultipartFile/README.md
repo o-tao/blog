@@ -172,7 +172,7 @@ S3Client를 Spring Bean에 등록하고, yml에 설정한 Key와 region 값을 @
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class S3ImageService {
+public class ImageService {
 
     private final S3Client s3Client;
     @Value("${aws.s3.bucket-name}")
@@ -180,10 +180,6 @@ public class S3ImageService {
 
     // [public 메서드] 외부에서 사용, S3에 저장된 이미지 객체의 public url을 반환
     public List<String> upload(List<MultipartFile> files) {
-        // 빈 파일 검증
-        if (files.isEmpty()) {
-            throw new CustomApplicationException(ErrorCode.EMPTY_FILE);
-        }
         // 각 파일을 업로드하고 url을 리스트로 반환
         return files.stream()
                 .map(this::uploadImage)
@@ -210,10 +206,10 @@ public class S3ImageService {
         }
 
         // 허용되지 않는 확장자 검증
-        String extension = filename.substring(lastDotIndex + 1).toLowerCase();
+        String extension = URLConnection.guessContentTypeFromName(filename);
         List<String> allowedExtentionList = Arrays.asList("jpg", "jpeg", "png", "gif");
-        if (!allowedExtentionList.contains(extension)) {
-            throw new CustomApplicationException(ErrorCode.INVALID_FILE_EXTENSION);
+        if (extension == null || !allowedExtentionList.contains(extension)) {
+          throw new CustomApplicationException(ErrorCode.INVALID_FILE_EXTENSION);
         }
     }
 
@@ -258,13 +254,13 @@ public class S3ImageService {
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/s3")
-public class S3ImageController {
+public class ImageController {
 
-    private final S3ImageService s3ImageService;
+    private final ImageService imageService;
 
     @PostMapping("/upload")
     public ResponseEntity<List<String>> s3Upload(@RequestPart(value = "image", required = false) List<MultipartFile> multipartFile) {
-        List<String> upload = s3ImageService.upload(multipartFile);
+        List<String> upload = imageService.upload(multipartFile);
         return ResponseEntity.ok(upload);
     }
 
@@ -300,7 +296,7 @@ Postman을 통해 이미지 업로드 요청 시 S3에 정상적으로 객체가
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class S3ImageService {
+public class ImageService {
 
     private final S3Client s3Client;
     @Value("${aws.s3.bucket-name}")
@@ -353,13 +349,13 @@ public class S3ImageService {
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/s3")
-public class S3ImageController {
+public class ImageController {
 
-    private final S3ImageService s3ImageService;
+    private final ImageService imageService;
 
     @DeleteMapping("/delete")
     public ResponseEntity<String> s3Delete(@RequestBody ImageDeleteRequest imageDeleteRequest) {
-        s3ImageService.delete(imageDeleteRequest.getImageUrls());
+        imageService.delete(imageDeleteRequest.getImageUrls());
         return ResponseEntity.ok("이미지 삭제 성공");
     }
 
