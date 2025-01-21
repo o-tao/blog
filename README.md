@@ -4,8 +4,9 @@ https://tao-tech.tistory.com/ 에서 제공되는 게시글 및 code 입니다.
 
 ## JPA
 
-- [JPA] JPA 1차 캐시란? 1차 캐시의 동작원리[Tistory](https://tao-tech.tistory.com/7) [GitHub](https://github.com/o-tao/blog/tree/main/jpa/JPA1%EC%B0%A8%EC%BA%90%EC%8B%9C%EB%8F%99%EC%9E%91%EC%9B%90%EB%A6%AC)
-- [JPA] JPA 영속성 컨텍스트란? 영속성 컨텍스트 개념과 이점 [Tistory](https://tao-tech.tistory.com/8) [GitHub](https://github.com/o-tao/blog/tree/main/jpa/JPA%20%EC%98%81%EC%86%8D%EC%84%B1%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8%20%EA%B0%9C%EB%85%90%EA%B3%BC%20%EC%9D%B4%EC%A0%90)
+- JPA 1차 캐시란? 1차 캐시의 동작원리[Tistory](https://tao-tech.tistory.com/7) [GitHub](https://github.com/o-tao/blog/tree/main/jpa/JPA1%EC%B0%A8%EC%BA%90%EC%8B%9C%EB%8F%99%EC%9E%91%EC%9B%90%EB%A6%AC)
+- JPA 영속성 컨텍스트란? 영속성 컨텍스트 개념과 이점 [Tistory](https://tao-tech.tistory.com/8) [GitHub](https://github.com/o-tao/blog/tree/main/jpa/JPA%20%EC%98%81%EC%86%8D%EC%84%B1%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8%20%EA%B0%9C%EB%85%90%EA%B3%BC%20%EC%9D%B4%EC%A0%90)
+- SpringDataJPA 공통 필드 BaseEntity로 관리하기, Auditing으로 시간관리하기 [Tistory](https://tao-tech.tistory.com/14) [GitHub](https://github.com/o-tao/blog/tree/main/jpa/%5BJPA%5D%20SpringDataJPA%20%EA%B3%B5%ED%86%B5%20%ED%95%84%EB%93%9C%20BaseEntity%EB%A1%9C%20%EA%B4%80%EB%A6%AC%ED%95%98%EA%B8%B0%2C%20Auditing%EC%9C%BC%EB%A1%9C%20%EC%8B%9C%EA%B0%84%EA%B4%80%EB%A6%AC%ED%95%98%EA%B8%B0)
 
 ## Spring
 
