@@ -113,3 +113,8 @@ MySQL에서 FOR UPDATE, FOR SHARE는 대상 레코드에 각 읽기, 쓰기 잠�
 | 1  | READ COMMITTED   | 없음         | 발생                  | 발생           |
 | 2  | REPEATABLE READ  | 없음         | 없음                  | 발생           |
 | 3  | SERIALIZABLE     | 없음         | 없음                  | 없음           |
+
+# 참고
+
+https://hoestory.tistory.com/86   
+https://mangkyu.tistory.com/299
