@@ -22,6 +22,7 @@ https://tao-tech.tistory.com/ 에서 제공되는 게시글 및 code 입니다.
 - [Spring] RequestBody, Response의 값이 null 일 때, JSON의 직렬화 역직렬화 [Tistory](https://tao-tech.tistory.com/16) [GitHub](https://github.com/o-tao/blog/tree/main/spring/%5BSpring%5D%20RequestBody%2C%20Response%EC%9D%98%20%EA%B0%92%EC%9D%B4%20null%20%EC%9D%BC%20%EB%95%8C%2C%20JSON%EC%9D%98%20%EC%A7%81%EB%A0%AC%ED%99%94%20%EC%97%AD%EC%A7%81%EB%A0%AC%ED%99%94)
 - [Spring] offset, no offset 차이점과 페이지네이션 구현예제 [Tistory](https://tao-tech.tistory.com/17) [GitHub](https://github.com/o-tao/blog/tree/main/spring/%5BSpring%5D%20offset%2C%20no%20offset%20%EC%B0%A8%EC%9D%B4%EC%A0%90%EA%B3%BC%20%ED%8E%98%EC%9D%B4%EC%A7%80%EB%84%A4%EC%9D%B4%EC%85%98%20%EA%B5%AC%ED%98%84%EC%98%88%EC%A0%9C)
 - [SpringBoot] AWS S3 다중 이미지 파일 업로드 및 삭제 구현하기 feat.MultipartFile [Tistory](https://tao-tech.tistory.com/27) [GitHub](https://github.com/o-tao/blog/tree/main/spring/%5BSpring%20Boot%5D%20AWS%20S3%20%EB%8B%A4%EC%A4%91%20%EC%9D%B4%EB%AF%B8%EC%A7%80%20%ED%8C%8C%EC%9D%BC%20%EC%97%85%EB%A1%9C%EB%93%9C%20%EB%B0%8F%20%EC%82%AD%EC%A0%9C%20%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0%20feat.MultipartFile)
+- [SpringBoot] 트랜잭션 전파 속성 (Transaction propagation) [Tistory](https://tao-tech.tistory.com/30) [GitHub](https://github.com/o-tao/blog/tree/main/spring/%5BSpring%20Boot%5D%20%ED%8A%B8%EB%9E%9C%EC%9E%AD%EC%85%98%20%EC%A0%84%ED%8C%8C%20%EC%86%8D%EC%84%B1%20(Transaction%20propagation))
 
 ## Server
 
