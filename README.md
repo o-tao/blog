@@ -28,6 +28,7 @@ https://tao-tech.tistory.com/ 에서 제공되는 게시글 및 code 입니다.
 
 - REST API, RESTful API란? [Tistory](https://tao-tech.tistory.com/11) [GitHub](https://github.com/o-tao/blog/tree/main/server/REST%20API%2C%20RESTful%20API%EB%9E%80%3F)
 - CSR과 SSR의 개념과 차이점 [Tistory](https://tao-tech.tistory.com/13) [GitHub](https://github.com/o-tao/blog/tree/main/server/CSR%EA%B3%BC%20SSR%EC%9D%98%20%EA%B0%9C%EB%85%90%EA%B3%BC%20%EC%B0%A8%EC%9D%B4%EC%A0%90)
+- 인증, 인가 세션(Session)과 토큰(Token)의 장단점과 차이점 [Tistory](https://tao-tech.tistory.com/18) [GitHub](https://github.com/o-tao/blog/tree/main/server/%EC%9D%B8%EC%A6%9D%2C%20%EC%9D%B8%EA%B0%80%20%EC%84%B8%EC%85%98(Session)%EA%B3%BC%20%ED%86%A0%ED%81%B0(Token)%EC%9D%98%20%EC%9E%A5%EB%8B%A8%EC%A0%90%EA%B3%BC%20%EC%B0%A8%EC%9D%B4%EC%A0%90)
 
 ## Docker
 
